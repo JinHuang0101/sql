@@ -225,7 +225,125 @@ FULL OUTER JOIN Orders ON Customers.CustomerID = Orders.CustomerID
 ORDER BY Customers.CustomerName; 
 
 
+# SELF JOIN
+# Matches customers that are from the same city 
+SELECT
+    A.CustomerName AS CustomerName1,
+    B.CustomerName AS CustomerName2,
+    A.City
+FROM
+    Customers A, Customers B
+WHERE
+    A.CustomerID <> B.CustomerID 
+    AND A.City = B.City
+ORDER BY 
+    A.City;
 
+# UNION
+# Returns the German cities (distinct values) from both the "Customers" and the "Suppliers" table
+SELECT
+    City
+FROM
+    Customers
+WHERE
+    Country = 'Germany'
+UNION
+SELECT
+    City
+FROM
+    Suppliers 
+WHERE
+    Country = 'Germany'
+ORDER BY 
+    City;
+
+# UNION ALL returns duplicate values also 
+
+
+# UNION with Aliases, create a new temp column named "Type" that list whether the contact person is a "Customer" or "Supplier"
+SELECT
+    'Customer' AS Type, ContactName, City, Country   
+FROM
+    Customers 
+UNION 
+SELECT 
+    'Supplier', ContactName, City, Country
+FROM 
+    Suppliers;
+
+# GROUP BY 
+# groups rows that have the same values into summary rows, like "find the number of customers in each country".
+SELECT
+    COUNT(CustomerID),
+    Country
+FROM
+    Customers
+GROUP BY 
+    Country
+ORDER BY 
+    COUNT(CustomerID) DESC;
+
+# JOIN Orders and Shippers table
+# Then find the number of orders sent by each shipper
+SELECT 
+    Shippers.ShipperName, 
+    COUNT(Orders.OrderID) AS NumberOfOrders
+FROM 
+    Orders  
+LEFT JOIN  
+    Shippers 
+        ON Orders.ShipperID = Shippers.ShipperID
+GROUP BY 
+    ShipperName;
+
+
+
+/*
+HAVING
+because WHERE cannot be used with aggregate function
+*/
+SELECT
+    COUNT(CustomerID),
+    Country
+FROM 
+    Customers
+GROUP BY 
+    Country
+HAVING 
+    COUNT(CustomerID)>5
+ORDER BY 
+    COUNT(CustomerID) DESC;
+
+#ists the employees that have registered more than 10 orders:
+SELECT
+    Employees.LastName,
+    COUNT(Orders.OrderID) AS NumberOfOrders
+FROM (
+    Orders 
+    INNER JOIN 
+        Employees
+        ON Orders.EmployeeID = Employees.EmployeeID
+)
+GROUP BY 
+    LastName
+HAVING
+    COUNT(Orders.OrderID)>10; 
+
+
+#lists if the employees "Davolio" or "Fuller" have registered more than 25 orders:
+SELECT 
+    Employees.LastName,
+    COUNT(Orders.OrderID) AS NumberOfOrders
+FROM 
+    Orders 
+    INNER JOIN 
+        Employees  
+        ON Orders.EmployeeID = Employees.EmployeeID
+WHERE LastName = 'Davolio' OR LastName = 'Fuller'
+GROUP BY 
+    LastName 
+HAVING 
+    COUNT(Orders.OrderID) > 25;
 
 
 
