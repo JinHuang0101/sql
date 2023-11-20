@@ -347,14 +347,127 @@ HAVING
 
 
 
+# CASE 
+# The following SQL goes through conditions and returns a value when the first condition is met:
+SELECT 
+    OrderId, 
+    Quantity,
+CASE 
+    WHEN Quantity > 30 THEN 'The quantity is greater than 30',
+    WHEN Quantity = 30 THEN 'The quantity is 30'
+    ELSE 'The quantity is under 30'
+END AS 
+    QuantityText
+
+FROM 
+    OrderDetails;
 
 
+# The following SQL will order the customers by City. However, if City is NULL, then order by Country:
+SELECT
+    CustomerName, City, Country
+FROM 
+    Customers
+ORDER BY 
+    (
+        CASE
+            WHEN City is NULL THEN Country 
+            ELSE City  
+        END
+        );
 
 
+# ANY 
+# lists the ProductName if it finds ANY records in the OrderDetails table 
+# has Quantity equal to 10 (this will return TRUE because the Quantity column has some values of 10):
+SELECT 
+    ProductName
+FROM 
+    Products 
+WHERE ProductID = ANY 
+    (
+        SELECT
+            ProductID 
+        FROM
+            OrderDetails
+        WHERE  
+            Quantity = 10
+        );
 
 
+# ALL
+# lists the ProductName if ALL the records in the OrderDetails table has Quantity equal to 10. 
+SELECT 
+    ProductName
+FROM 
+    Products
+WHERE 
+    ProductID = ALL 
+    (
+        SELECT 
+            ProductID
+        FROM 
+            OrderDetails
+        WHERE
+            Quantity = 10 
+        );
+
+# SELECT INTO 
+# Creates a backup copy of Customers
+SELECT *
+INTO
+    CustomersBackup2017 
+FROM 
+    Customers; 
+
+# uses the IN clause to copy the table into a new table in another database:
+SELECT 
+    *
+INTO 
+    CustomersBackup2017
+IN
+    'Backup.mdb' 
+FROM 
+    Customers;
 
 
+# Copies a few columns into a new table 
+SELECT 
+    CustomerName, ContactName
+INTO 
+    CustomersBackup2017
+FROM 
+    Customers;
+
+# Copy only the German customers into a new table 
+SELECT 
+    *
+INTO 
+    CustomersGermany
+FROM 
+    Customers
+WHERE 
+    Country = 'Germany';
+
+# Copy data from more than one table into a new table
+SELECT 
+    Customers.CustomerName, Orders.OrderID
+INTO CustomersBackup2017
+FROM 
+    Customers
+LEFT JOIN 
+    Orders ON Customers.CustomerID = Orders.CustomerID;
+
+
+# Tip: SELECT INTO can also be used to create a new, empty table using the schema of another. Just add a WHERE clause that causes the query to return no data:
+SELECT 
+    *
+INTO newtable 
+FROM 
+    oldtable 
+WHERE
+    1 = 0;
+    
 
 
 
